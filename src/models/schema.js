@@ -118,6 +118,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -223,6 +230,13 @@ export const schema = {
                     "isArray": false,
                     "type": "Boolean",
                     "isRequired": true,
+                    "attributes": []
+                },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "Payment": {
@@ -361,6 +375,13 @@ export const schema = {
                     "isArray": false,
                     "type": "Int",
                     "isRequired": true,
+                    "attributes": []
+                },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "User": {
@@ -519,6 +540,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "categoryID": {
                     "name": "categoryID",
                     "isArray": false,
@@ -642,6 +670,13 @@ export const schema = {
                     "name": "parentCategoryId",
                     "isArray": false,
                     "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -775,6 +810,13 @@ export const schema = {
                     "type": {
                         "enum": "UserType"
                     },
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -943,14 +985,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "hero": {
-                    "name": "hero",
-                    "isArray": true,
-                    "type": "String",
-                    "isRequired": true,
-                    "attributes": [],
-                    "isArrayNullable": true
-                },
                 "description": {
                     "name": "description",
                     "isArray": false,
@@ -958,15 +992,36 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "ownerEmail": {
-                    "name": "ownerEmail",
+                "mainColor": {
+                    "name": "mainColor",
                     "isArray": false,
-                    "type": "AWSEmail",
+                    "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
-                "ownerAddress": {
-                    "name": "ownerAddress",
+                "primaryColor": {
+                    "name": "primaryColor",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "secondarycolr": {
+                    "name": "secondarycolr",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "currency": {
+                    "name": "currency",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "address": {
+                    "name": "address",
                     "isArray": false,
                     "type": "AWSJSON",
                     "isRequired": false,
@@ -1038,6 +1093,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -1089,6 +1151,114 @@ export const schema = {
                     }
                 }
             ]
+        },
+        "Advert": {
+            "name": "Advert",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "backgroundImageUrl": {
+                    "name": "backgroundImageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "title": {
+                    "name": "title",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "backgroundColor": {
+                    "name": "backgroundColor",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "bannerUrl": {
+                    "name": "bannerUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "status": {
+                    "name": "status",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "hasBg": {
+                    "name": "hasBg",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "isDeleted": {
+                    "name": "isDeleted",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "textColor": {
+                    "name": "textColor",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                }
+            },
+            "syncable": true,
+            "pluralName": "Adverts",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     },
     "enums": {
@@ -1102,5 +1272,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "60e65b764b71bc83b4b698ba417ef214"
+    "version": "03af26e402e7c58e8311c7b956c2969d"
 };

@@ -21,12 +21,17 @@ export default function Login() {
   const router = useRouter();
   const [friends, setFriends] = useState();
 
-  const { user, errorMsg, isLoading, isSuccess, isError, isGoogle }: any =
-    useSelector((state: RootState) => state.auth);
+  const {
+    user,
+    errorMsg,
+    isLoading,
+    isSuccess,
+    isError,
+    isGoogle,
+    isLoadingGoogle,
+  }: any = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    const test = Auth.currentAuthenticatedUser();
-    console.log(test);
     if (isSuccess && !isGoogle) {
       router.replace("/");
       dispatch(reset());
@@ -387,7 +392,7 @@ export default function Login() {
                     signinUser({ email, password });
                   }}
                   type="submit"
-                  disabled={isLoading ? true : false}
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <div className="flex justify-center gap-2">
@@ -550,7 +555,7 @@ export default function Login() {
                           />
                         </g>
                       </svg>{" "}
-                      Loading{" "}
+                      Loading...
                     </div>
                   ) : (
                     "Login"
@@ -564,9 +569,9 @@ export default function Login() {
                     googleSignin();
                   }}
                   type="submit"
-                  disabled={isLoading ? true : false}
+                  disabled={isLoading}
                 >
-                  {isLoading && isGoogle ? (
+                  {isLoadingGoogle ? (
                     <div className="flex justify-center gap-2">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -727,7 +732,7 @@ export default function Login() {
                           />
                         </g>
                       </svg>{" "}
-                      Loading{" "}
+                      Loading...
                     </div>
                   ) : (
                     "Google"

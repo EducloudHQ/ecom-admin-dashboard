@@ -1,23 +1,54 @@
-
 import { Auth, DataStore, Predicates, withSSRContext } from "aws-amplify";
-import { Order } from "../../../models";
+import { Order, User } from "../../../models";
+import userService from "../user/userService";
+import { use } from "react";
 
 const getAllOrders = async () => {
-    try
-    {
-        const data = await DataStore.query(Order)
-        return data
-    } catch (err)
-    {
-        console.log(err);
-        throw err
+  try {
+    const users = [];
+    const orderRes = await DataStore.query(Order, Predicates.ALL);
+    for (let user of orderRes) {
+      users.push(user.userID);
     }
-}
+
+    const usersWithOrders = await userService.getUsersById(users);
+
+    const res = orderRes.map((order: any) => {
+      let modOrder = {};
+      for (let user of usersWithOrders) {
+        if (user.id === order.userID) {
+          modOrder = {
+            ...order,
+            username: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            tel: user.phone,
+            address: user.address,
+          };
+        }
+      }
+      return modOrder;
+    });
+    return res;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
+const placeOrder = async (items: any) => {
+  try {
+    const data = await DataStore.save(new Order(items));
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
 
 const filterOrders = async (filter: any) => {
   try {
     // const filter
-    console.log(filter);
+    // console.log(filter);
     const filterBy = filter.filterBy ? filter.filterBy : filter;
     let userResult;
     switch (filterBy) {
@@ -46,7 +77,6 @@ const filterOrders = async (filter: any) => {
   }
 };
 
-
 const deleteOrders = async (order: any) => {
   try {
     console.log(order);
@@ -62,11 +92,12 @@ const deleteOrders = async (order: any) => {
     throw error;
   }
 };
-  
-const orderService = {
-    getAllOrders,
-    filterOrders,
-    deleteOrders
-}
 
-export default orderService
+const orderService = {
+  getAllOrders,
+  filterOrders,
+  deleteOrders,
+  placeOrder,
+};
+
+export default orderService;

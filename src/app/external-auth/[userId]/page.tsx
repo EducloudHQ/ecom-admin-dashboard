@@ -5,10 +5,11 @@ import {
   googleSignIn,
   reset,
   signup,
+  updateGoogleUser,
 } from "@/src/redux-store/feature/user/authSlice";
 import { googleUserForm } from "@/src/types/types";
 import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import {
@@ -16,32 +17,29 @@ import {
   RegionDropdown,
   CountryRegionData,
 } from "react-country-region-selector";
-import { User } from "@/src/models";
-import { DataStore } from "aws-amplify";import { Amplify } from "aws-amplify";
-import awsExports from "@/src/aws-exports";
-
-if (typeof window !== 'undefined')
-{
-  awsExports.oauth["redirectSignIn"] = `${window.location.origin}/external-auth/`;
-  awsExports.oauth["redirectSignOut"] = `${window.location.origin}/`;
-  Amplify.configure({ ...awsExports, ssr: true });
-}
-if (typeof window === "undefined")
-{
-  Amplify.configure({ ...awsExports, ssr: true });
-}
 
 export default function Register() {
-  const params = useParams()
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const userData = searchParams.getAll("code");
+  console.log("My data", params);
+  const [phone, setPhone] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
-  const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [adLine1, setadLine1] = useState("");
-  const [adLine2, setadLine2] = useState("");
+
+  const [errors, setErrors]: any = useState({});
+  const [values, setValues] = useState({
+    firstName: "",
+    lastName: "",
+    region: region,
+    phone: "",
+    city: "",
+    country: country,
+    zipCode: "",
+    adLine1: "",
+    adLine2: "",
+  });
   const dispatch = useDispatch<AppDispatch>();
 
   const { user, errorMsg, isLoading, isSuccess, isGoogle }: any = useSelector(
@@ -49,55 +47,54 @@ export default function Register() {
   );
   const router = useRouter();
   useEffect(() => {
-    if (isSuccess && !isGoogle) {
+    if (isSuccess) {
       router.replace(`/`);
       dispatch(reset());
     }
   }, [isLoading, isSuccess, errorMsg]);
 
+  const signupUser = async (
+    id: string,
+    userLogin: googleUserForm,
+    formErrors: any,
+  ) => {
+    console.log("User>>>>", userLogin);
+    if (values.firstName == "") {
+      formErrors.firstName = "Required!";
+    }
+    if (values.lastName == "") {
+      formErrors.lastName = "Required!";
+    }
+    if (values.city == "") {
+      formErrors.city = "Required!";
+    }
+    if (values.zipCode == "") {
+      formErrors.zipCode = "Required!";
+    }
+    if (values.adLine1 == "") {
+      formErrors.adLine1 = "Required!";
+    }
 
-    const signupUser = async ( id: string, userLogin: googleUserForm) => {
-    userLogin.address = `{
-      \"coutry\":\"${country}\",
-      \"region\":\"${region}\",
-      \"city\":\"${city}\",
-      \"zipCode\":\"${zipCode}\",
-      \"addressLine1\":\"${adLine1}\",
-      \"addressLine2\":\"${adLine2}\"
-  }`;
+    if (Object.keys(formErrors).length === 0) {
+      dispatch(updateGoogleUser({ id: id, data: userLogin }));
+    } else {
+      console.log(formErrors);
+      setErrors(formErrors);
+    }
+  };
 
-    console.log(userLogin);
-      await DataStore.query(User, id).then(async (original:any) => {
-      const user = await DataStore.save(
-        User.copyOf(original, updated => {
-          updated.firstName = userLogin.firstName,
-            updated.lastName = userLogin.lastName,
-            updated.address = userLogin.address
-            updated.phone = userLogin.phoneNumber
-        })
-      ).then((data) => {
-        router.replace('/')
-      })
-})
-  
-    };
-  
+  const onChange = (event: any) => {
+    const { name, value } = event.target;
+    setValues({ ...values, [name]: value });
+  };
+
   return (
     <>
-      <main className="h-scree w-full bg-white flex justify-center items-center px-36 ">
-        <div className="flex justify-center items-center min-[1100px]:gap-5 gap-5 w-full">
+      <main className="h-full w-full bg-white flex justify-center items-center sm:px-36 px-4 ">
+        <div className="flex my-8 justify-center items-center min-[1100px]:gap-5 gap-5 w-full">
           <div className="h-full w-full max-w-xl">
             <div className="shadow-lg rounded-md h-fi w-full px-10 py-5 min-[1100px]:px-16">
-              <div className="flex justify-between">
-                <h2 className="border-t-[2px] w-fit text-black text-[22px] border-green-700 font-bold">
-                  Update your credentials
-                </h2>
-              </div>
               <form className="pb-[10px]">
-                <h5 className="text-red-600 text-[14px] pl-0 pt-[3px] font-medium">
-                  {errorMsg.replace("Username", "Email")}
-                </h5>
-
                 <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full">
                   <div className="mb-2 w-full">
                     <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -106,12 +103,15 @@ export default function Register() {
                     <input
                       type="text"
                       id="firstName"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      value={values.firstName}
+                      name="firstName"
+                      onChange={onChange}
                       className="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                       placeholder="First name"
                     />
-                    <h5 className="text-red-600 text-[14px] pl-1 pt-[6px] font-medium"></h5>
+                    <p className="text-red-500 text-sm font-light pt-[6px] error">
+                      {errors?.firstName}
+                    </p>
                   </div>
 
                   <div className="mb-2 w-full">
@@ -121,17 +121,20 @@ export default function Register() {
                     <input
                       type="text"
                       id="lastName"
-                      value={lastName}
+                      value={values.lastName}
                       className="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                       placeholder="Last name"
-                      onChange={(e) => setLastName(e.target.value)}
+                      name="lastName"
+                      onChange={onChange}
                     />
-                    <h5 className="text-red-600 text-[14px] pl-1 pt-[6px] font-medium"></h5>
+                    <p className="text-red-500 text-sm font-light pt-[6px] error">
+                      {errors?.lastName}
+                    </p>
                   </div>
                 </div>
 
                 <div className="border-gray-300  w-full">
-                  <div className="w-1/2 overflow-x-hidden border-gray-300">
+                  <div className="overflow-x-hidden w-full sm:w-1/2 border-gray-300">
                     <label className="block mb-2 text-sm font-medium text-gray-900">
                       Phone number *
                     </label>
@@ -140,11 +143,15 @@ export default function Register() {
                       enableSearch={true}
                       value={phone}
                       containerClass=""
-                      buttonClass="bg-gray-50"
-                      inputClass="bg-gray-50 border bg-blue-600 focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-fulld p-1.5"
+                      inputStyle={{
+                        width: "100%",
+                      }}
                       onChange={(phone: any) => setPhone(phone)}
                     />
                   </div>
+                  <p className="text-red-500 text-sm font-light pt-[6px] error">
+                    {phone == "" ? "phone number is require" : ""}
+                  </p>
                 </div>
 
                 <div className="flex gap-2 sm:flex-nowrap flex-wrap my-3">
@@ -155,9 +162,18 @@ export default function Register() {
                     <CountryDropdown
                       classes="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                       value={country}
+                      name="country"
                       onChange={(val) => setCountry(val)}
                     />
+
+                    <p className="text-red-500 text-sm font-light pt-[6px] error">
+                      {errors?.country}
+                    </p>
                   </div>
+
+                  <p className="text-red-500 text-sm font-light pt-[6px] error">
+                    {errors?.country}
+                  </p>
 
                   <div className="w-full">
                     <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -166,10 +182,14 @@ export default function Register() {
                     <RegionDropdown
                       classes="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                       country={country}
+                      name="region"
                       value={region}
                       onChange={(val) => setRegion(val)}
                     />
                   </div>
+                  <p className="text-red-500 text-sm font-light pt-[6px] error">
+                    {errors?.region}
+                  </p>
                 </div>
 
                 <div className="flex gap-2">
@@ -180,11 +200,15 @@ export default function Register() {
                     <input
                       type="text"
                       id="city"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
+                      value={values.city}
+                      name="city"
+                      onChange={onChange}
                       className="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                       placeholder="San fransisco"
                     />
+                    <p className="text-red-500 text-sm font-light pt-[6px] error">
+                      {errors?.city}
+                    </p>
                   </div>
 
                   <div className="mb-2 w-full">
@@ -194,11 +218,15 @@ export default function Register() {
                     <input
                       type="text"
                       id="zipecode"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(e.target.value)}
+                      value={values.zipCode}
+                      name="zipCode"
+                      onChange={onChange}
                       className="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                       placeholder=""
                     />
+                    <p className="text-red-500 text-sm font-light pt-[6px] error">
+                      {errors?.zipCode}
+                    </p>
                   </div>
                 </div>
 
@@ -209,11 +237,15 @@ export default function Register() {
                   <input
                     type="text"
                     id="address_line_1"
-                    value={adLine1}
-                    onChange={(e) => setadLine1(e.target.value)}
+                    value={values.adLine1}
+                    name="adLine1"
+                    onChange={onChange}
                     className="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                     placeholder="456 Elm Street"
                   />
+                  <p className="text-red-500 text-sm font-light pt-[6px] error">
+                    {errors?.adLine1}
+                  </p>
                 </div>
 
                 <div className="mb-2 w-full">
@@ -223,26 +255,38 @@ export default function Register() {
                   <input
                     type="text"
                     id="address_line_2"
-                    value={adLine2}
-                    onChange={(e) => setadLine2(e.target.value)}
+                    value={values.adLine2}
+                    name="adLine2"
+                    onChange={onChange}
                     className="bg-gray-50 border focus:border-green-500 border-gray-300 text-gray-900 text-sm rounded-md outline-none w-full p-1.5"
                     placeholder="456 Elm Street"
                   />
-                              </div>
-                              <div className="flex gap-2">
+                </div>
+                <div className="flex gap-2">
                   <button
                     className="text-white mb-5 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center "
                     onClick={(e) => {
                       e.preventDefault();
-                      signupUser(params.userId as string, {
-                        firstName,
-                        lastName,
-                        phoneNumber: phone,
-                        address: "",
-                      });
+                      signupUser(
+                        params.userId as string,
+                        {
+                          firstName: values.firstName,
+                          lastName: values.lastName,
+                          phoneNumber: phone,
+                          address: JSON.stringify({
+                            coutry: country,
+                            region: region,
+                            city: values.city,
+                            zipCode: values.zipCode,
+                            addressLine1: values.adLine1,
+                            addressLine2: values.adLine2,
+                          }),
+                        },
+                        {},
+                      );
                     }}
                     type="submit"
-                    disabled={isLoading ? true : false}
+                    disabled={isLoading}
                   >
                     {isLoading ? (
                       <div className="flex justify-center gap-2">
@@ -435,13 +479,12 @@ export default function Register() {
                             />
                           </g>
                         </svg>{" "}
-                        Loading{" "}
+                        Loading...
                       </div>
                     ) : (
                       "Update"
                     )}
                   </button>
-
                 </div>
                 {/* <Button containerStyles="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center " title={isLoading? 'Loading': "Google"} handleClick={(e)=>{e.preventDefault(); googleSignin()}} btnType="submit"/> */}
               </form>

@@ -7,7 +7,7 @@ import { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
 const getAllUsers = async () => {
     try
     {
-        const data = await DataStore.query(User)
+        const data = await DataStore.query(User, Predicates.ALL)
         return data
     } catch (err)
     {
@@ -44,9 +44,10 @@ const filterUsers = async (filter: any) => {
         case "search":
             userResult = await DataStore.query(User, (user) =>
                 user.or(user => [
-                    user.firstName.contains(filter.search.toLowerCase()),
-                    user.lastName.contains(filter.search.toLowerCase())
-  ]),
+                    user.firstName.contains(filter.search),
+                    user.lastName.contains(filter.search),
+                  user.email.contains(filter.search)
+                ]),
         );
         break;
 
@@ -104,6 +105,35 @@ const blockUser = async (user: any) => {
   }
 }
 
+    const getUserById = async (userId: string)=>{
+    try {
+      const data = await DataStore.query(User, userId
+      )
+        return data;
+    }catch(err){
+      console.log(`Error logging user with google: ${err}`)
+      throw err
+     }
+  }
+
+
+const getUsersById = async (userIds: any) => {
+        console.log(userIds)
+        try
+        {
+          let data: any[] = [];
+      for (let userId of userIds)
+      {
+        let res = await DataStore.query(User, userId).then(data => data)
+        data.push(res)
+      }
+        return data;
+    }catch(err){
+      console.log(`No user with given Id: ${err}`)
+      throw err
+     }
+}
+      
 const unBlockUser = async (user: any) => {
   try
   {
@@ -132,7 +162,9 @@ const userService = {
     filterUsers,
   deleteUsers,
   blockUser,
-    unBlockUser
+  unBlockUser,
+  getUserById,
+    getUsersById
 }
 
 export default userService

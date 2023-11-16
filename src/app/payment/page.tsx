@@ -5,7 +5,7 @@ import DashboardLayout from "@/src/app/dashboardLayout";
 import { useEffect, useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import { paymentAttributes } from "@/src/constants";
-import { Button, CustomModal, Delete } from "@/src/components";
+import { Button, CustomModal } from "@/src/components";
 import { CountryDropdown } from "react-country-region-selector";
 import {
   deletePayments,
@@ -15,7 +15,6 @@ import {
 
 export default function Page() {
   const [search, setSearch] = useState("");
-  const [del, setDel] = useState(false);
 
   const [isDelete, setisDelete] = useState(false);
   let selectedPayments: string[] = [];
@@ -44,11 +43,9 @@ export default function Page() {
   };
 
   useEffect(() => {
-    if (isDelete) {
-      deletePaymentsFn();
-    }
     filterPay({ filterBy: "category" });
   }, [isDelete]);
+
   const deletePaymentsFn = (payId?: string) => {
     console.log("Users>>>>>: ", selectedPayments);
     if (selectedPayments.length > 0) {
@@ -65,7 +62,6 @@ export default function Page() {
 
   return (
     <DashboardLayout>
-      {/* <Delete item="User" /> */}
       <main className="w-full h-full sticky top-0 overflow-y-hidden">
         <nav className="flex sticky top-0 my-2" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
@@ -103,7 +99,7 @@ export default function Page() {
                   className="ml-1 text-gray-400 md:ml-2 "
                   aria-current="page"
                 >
-                  Users
+                  Payments
                 </span>
               </div>
             </li>
@@ -201,67 +197,6 @@ export default function Page() {
                     </ul>
                   </div>
                 </div>
-
-                {/* <div className="group">
-                  <Link
-                    href={"#"}
-                    className=" border text-gray-900 font-semibold border-orange-300 focus:ring-0 group-hover:text-white group-hover:border-none group-hover:bg-orange-300 rounded-lg text-sm px-4 gap-1 py-1.5 flex items-center"
-                    type="button"
-                  >
-                    <Button
-                      title="Actions"
-                      btnType="button"
-                      containerStyles="text-orange-500 group-hover:text-white"
-                      isDisable={true}
-                    />{" "}
-                    <svg
-                      className="fill-current text-red-500 h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />{" "}
-                    </svg>
-                  </Link>
-
-                  <div
-                    id="dropdown"
-                    className="z-10 hidden mt-1 group-hover:block absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-[105px] "
-                  >
-                    <ul
-                      className="py-2 text-sm text-red-500 "
-                      aria-labelledby="dropdownDefaultButton"
-                    >
-
-                      <li className="block px-4 py-2 hover:bg-red-100 ">
-                        <Button
-                          title="Delete"
-                          handleClick={(e) => {
-                            // setisDelete(true);
-                            deletePaymentsFn()
-                          }}
-                        />
-                      </li>
-
-                      <li className="block px-4 py-2 hover:bg-red-100 ">
-                        <Button
-                          title="Ordered"
-                          // handleClick={(e) => {
-                          //   setisDelete(true);
-                          // }}
-                        />
-                      </li>
-
-                      <li className="block px-4 py-2 hover:bg-green-100 text-green-500 ">
-                        <Button
-                          title="Pending"
-                          // handleClick={(e) => {
-                          //   setisDelete(true);
-                          // }}
-                        />
-                      </li>
-                    </ul>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
@@ -270,36 +205,16 @@ export default function Page() {
             <div className="overflow-x-autdfo rounded-lg">
               <div className="inline-block min-w-full align-middle">
                 <div className="shadow sm:rounded-lg w-full">
-                  {isLoading ? (
-                    <div className="w-full h-[100px] text-blue-500 flex">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="32"
-                        height="32"
-                        viewBox="0 0 24 24"
-                        className="m-auto mx-auto"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M12,23a9.63,9.63,0,0,1-8-9.5,9.51,9.51,0,0,1,6.79-9.1A1.66,1.66,0,0,0,12,2.81h0a1.67,1.67,0,0,0-1.94-1.64A11,11,0,0,0,12,23Z"
-                        >
-                          <animateTransform
-                            attributeName="transform"
-                            dur="0.75s"
-                            repeatCount="indefinite"
-                            type="rotate"
-                            values="0 12 12;360 12 12"
-                          />
-                        </path>
-                      </svg>
+                  {payments.length === 0 ? (
+                    <div className="w-full text-center">
+                      {" "}
+                      No Payments available
                     </div>
                   ) : (
                     <table className="min-w-full divide-y divide-gray-200  mb-3">
                       <thead className="bg-gray-100  sticky top-0">
                         <tr className="[&:nth-child(1)]:bg-blue-50d0">
-                          <th className="pl-2">
-                            {/* <input type="checkbox"  /> */}
-                          </th>
+                          <th className="pl-2"></th>
                           {paymentAttributes.map(
                             (item: string, index: number) => (
                               <th
@@ -313,63 +228,92 @@ export default function Page() {
                           )}
                         </tr>
                       </thead>
-                      <tbody className="">
-                        {payments?.map((payment: any, index: number) => {
-                          return (
-                            <tr
-                              key={payment.id}
-                              className="even:bg-gray-50 text-black hover:cursor-pointer group"
+                      {isLoading ? (
+                        <tr>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <div className="w-full h-[100px] text-blue-500 flex">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="32"
+                              height="32"
+                              viewBox="0 0 24 24"
+                              className="my-auto"
                             >
-                              <td className="px-2 ">
-                                {
-                                  <input
-                                    type="checkbox"
-                                    className="bg-black"
-                                    value={payment.id}
-                                    onChange={select}
-                                  />
-                                }
-                              </td>
-                              <td className="p-4 text-sm font-normal text-gray-900 whitespace-nowrap ">
-                                <span className="font-semibold text-left flex flex-col">
-                                  {/* <Link href={`/update-product/${order.id}`}> */}
+                              <path
+                                fill="currentColor"
+                                d="M12,23a9.63,9.63,0,0,1-8-9.5,9.51,9.51,0,0,1,6.79-9.1A1.66,1.66,0,0,0,12,2.81h0a1.67,1.67,0,0,0-1.94-1.64A11,11,0,0,0,12,23Z"
+                              >
+                                <animateTransform
+                                  attributeName="transform"
+                                  dur="0.75s"
+                                  repeatCount="indefinite"
+                                  type="rotate"
+                                  values="0 12 12;360 12 12"
+                                />
+                              </path>
+                            </svg>
+                          </div>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      ) : (
+                        <tbody className="">
+                          {payments?.map((payment: any, index: number) => {
+                            return (
+                              <tr
+                                key={payment.id}
+                                className="even:bg-gray-50 text-black hover:cursor-pointer group"
+                              >
+                                <td className="px-2 ">
+                                  {
+                                    <input
+                                      type="checkbox"
+                                      className="bg-black"
+                                      value={payment.id}
+                                      onChange={select}
+                                    />
+                                  }
+                                </td>
+                                <td className="p-4 text-sm max-w-[200px] truncate font-semibold text-left text-gray-900 whitespace-nowrap ">
                                   {payment.id}
-                                  {/* </Link> */}
-                                </span>
-                              </td>
-                              <td className="p-4 text-sm font-normal text-left text-gray-500 whitespace-nowrap ">
-                                {payment.userID}
-                              </td>
+                                </td>
+                                <td className="p-4 text-sm max-w-[200px] truncate font-normal text-left text-gray-500 whitespace-nowrap ">
+                                  {payment.orderId}
+                                </td>
 
-                              <td className="p-4 text-sm font-normal text-gray-900 text-left whitespace-nowrap  truncate">
-                                {/* {categories?.map((cat: any)=>cat.id == .categoryID? cat.name:'' )} */}{" "}
-                                {payment.amount}
-                              </td>
-                              <td className="p-4 text-sm font-normal text-gray-900 text-left whitespace-nowrap  truncate">
-                                {/* {categories?.map((cat: any)=>cat.id == .categoryID? cat.name:'' )} */}{" "}
-                                {payment.createdAt.split("T")[0]}
-                              </td>
-                              <td className="p-4 text-sm font-normal text-gray-900 text-left whitespace-nowrap  truncate">
-                                {/* {categories?.map((cat: any)=>cat.id == .categoryID? cat.name:'' )} */}{" "}
-                                {payment.paymentIntentId}
-                              </td>
+                                <td className="p-4 text-sm font-normal text-left text-gray-500 whitespace-nowrap ">
+                                  {payment.username}
+                                </td>
 
-                              <td className="flex justify-start items-center p-4 h-full">
-                                {payment.paymentStatus ? (
-                                  <div className="bg-green-100 rounded-md  text-green-800 h-full w-fit text-xs font-medium px-2 py-1">
-                                    Payed
-                                  </div>
-                                ) : (
-                                  <div className="bg-red-100 text-red-800 h-full w-fit text-xs font-medium px-2 py-1 rounded-md">
-                                    Pending
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                            // </Link>
-                          );
-                        })}
-                      </tbody>
+                                <td className="p-4 text-sm font-normal text-gray-900 text-left whitespace-nowrap  truncate">
+                                  {payment.amount / 100}
+                                </td>
+                                <td className="p-4 text-sm font-normal text-gray-900 text-left whitespace-nowrap  truncate">
+                                  {payment.createdAt.split("T")[0]}
+                                </td>
+                                <td className="p-4 text-sm max-w-[200px] truncate font-normal text-gray-900 text-left whitespace-nowrap">
+                                  {payment.paymentIntentId}
+                                </td>
+
+                                <td className="flex justify-start items-center p-4 h-full">
+                                  {payment.paymentStatus ? (
+                                    <div className="bg-green-100 rounded-md  text-green-800 h-full w-fit text-xs font-medium px-2 py-1">
+                                      Payed
+                                    </div>
+                                  ) : (
+                                    <div className="bg-red-100 text-red-800 h-full w-fit text-xs font-medium px-2 py-1 rounded-md">
+                                      Pending
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      )}
                       <tfoot className="bg-gray-100  sticky top-0">
                         <tr>
                           <th className="w-4 pl-2"></th>
@@ -388,7 +332,6 @@ export default function Page() {
                       </tfoot>
                     </table>
                   )}
-                  {/* )} */}
                 </div>
               </div>
             </div>

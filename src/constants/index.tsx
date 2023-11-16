@@ -1,8 +1,9 @@
 export const productAttributes = [
   "IMAGE",
-  "NAME",
+  "PRODUCT NAME",
   "DESCRIPTION",
   "CATEGORY",
+  // "SUB-CATEGORY",
   "PRICE",
   "QUANTITY",
   "STATUS",
@@ -142,18 +143,21 @@ export const users = [
 
 export const orderAttributes = [
   "ORDER ID",
-  "USER ID",
+  // "USER ID",
+  "USER NAME",
   "ORDER DATE",
-  "ORDER STATUS",
+  "STATUS",
 ];
 
 export const paymentAttributes = [
   "PAYMENT ID",
-  "USER ID",
+  // "USER ID",
+  "ORDER ID",
+  "USER NAME",
   "AMOUNT",
-  "PAYMENT DATE",
-  "PAYMENT INTENT ID",
-  "PAYMENT STATUS",
+  "DATE",
+  "INTENT ID",
+  "STATUS",
 ];
 
 export const S3BucketLink =

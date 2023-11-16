@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false,
   swcMinify: true,
   images: {
-    domains: ["flowbite.com", "freesvg.org"],
+    domains: [
+      "flowbite.com",
+      "freesvg.org",
+      "commerce4f57f623543047fc87b7ef20e805713093837-staging.s3.amazonaws.com",
+    ],
   },
   trailingSlash: true,
   webpack: (config, { webpack, isServer, nextRuntime }) => {
